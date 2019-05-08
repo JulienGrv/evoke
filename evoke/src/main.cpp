@@ -4,13 +4,17 @@
 #include "Reporter.h"
 #include "Toolset.h"
 
+#include <boost/program_options.hpp>
 #include <chrono>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <thread>
+
 using namespace std::literals::chrono_literals;
+
+namespace po = boost::program_options;
 
 template<typename T>
 std::ostream &operator<<(std::ostream &os, std::vector<T> v)
@@ -58,15 +62,37 @@ void parseArgs(std::vector<std::string> args, std::map<std::string, std::string 
 
 int main(int argc, const char **argv)
 {
-    std::string toolsetname;
+    std::string toolset_name;
 
 #if defined(_WIN32)
-    toolsetname = "windows";
+    toolset_name = "windows";
 #else
-    toolsetname = "gcc";
+    toolset_name = "gcc";
 #endif
 
-    std::cout << "Building for " << toolsetname << std::endl;
+    // Init arguments parser
+    po::options_description desc("Options");
+    desc.add_options()("help", "produce help message")("toolset-name", po::value<std::string>(&toolset_name), "specify toolset name (default: )");
+
+    // Parse arguments
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
+    // Handle arguments
+    if(vm.count("help"))
+    {
+        std::cout << desc << "\n";
+        return 0;
+    }
+
+    if(vm.count("toolset-name"))
+    {
+        std::cout << "Toolset: "
+                  << vm["toolset-name"].as<std::string>() << ".\n";
+    }
+
+    std::cout << "Building for " << toolset_name << std::endl;
 
     std::string rootpath = filesystem::current_path().generic_string();
     std::string jobcount = std::to_string(std::max(4u, std::thread::hardware_concurrency()));
@@ -75,7 +101,7 @@ int main(int argc, const char **argv)
     bool cmakelists = false;
     bool verbose = false;
     bool unitybuild = false;
-    parseArgs(std::vector<std::string>(argv + 1, argv + argc), {{"-t", toolsetname}, {"--root", rootpath}, {"-j", jobcount}, {"-r", reporterName}}, {{"-cp", compilation_database}, {"-v", verbose}, {"-cm", cmakelists}, {"-u", unitybuild}});
+    parseArgs(std::vector<std::string>(argv + 1, argv + argc), {{"-t", toolset_name}, {"--root", rootpath}, {"-j", jobcount}, {"-r", reporterName}}, {{"-cp", compilation_database}, {"-v", verbose}, {"-cm", cmakelists}, {"-u", unitybuild}});
     Project op(rootpath);
     if(!op.unknownHeaders.empty())
     {
@@ -92,7 +118,7 @@ int main(int argc, const char **argv)
     {
         std::cerr << "Unknown header: " << u << "\n";
     }
-    std::unique_ptr<Toolset> toolset = GetToolsetByName(toolsetname);
+    std::unique_ptr<Toolset> toolset = GetToolsetByName(toolset_name);
     if(unitybuild)
     {
         toolset->CreateCommandsForUnity(op);

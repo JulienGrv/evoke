@@ -16,7 +16,7 @@ RUN wget -q --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linu
 RUN wget -q --no-check-certificate https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.bz2 && \
     tar -xjf boost_1_64_0.tar.bz2 && \
     cd boost_1_64_0 && \
-    ./bootstrap.sh --with-libraries=system >/dev/null && \
+    ./bootstrap.sh --with-libraries=program_options,system >/dev/null && \
     ./b2 install variant=release link=static threading=multi >/dev/null
 
 COPY . evoke

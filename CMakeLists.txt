@@ -59,10 +59,12 @@ find_package(Threads REQUIRED)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC"
    OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0"))
-  find_package(Boost 1.64 REQUIRED COMPONENTS filesystem system)
-  target_link_libraries(${PROJECT_NAME} PRIVATE Boost::disable_autolinking)
+  find_package(Boost 1.64 REQUIRED COMPONENTS filesystem program_options system)
+  target_link_libraries(${PROJECT_NAME}
+                        PRIVATE Boost::disable_autolinking
+                                Boost::dynamic_linking)
 else()
-  find_package(Boost 1.64 REQUIRED COMPONENTS system)
+  find_package(Boost 1.64 REQUIRED COMPONENTS program_options system)
   target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)
 endif()
 
