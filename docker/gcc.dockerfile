@@ -21,8 +21,7 @@ RUN wget -q --no-check-certificate https://dl.bintray.com/boostorg/release/1.64.
 
 COPY . evoke
 
-RUN cmake --version && \
-    cmake -E remove_directory ./evoke/build && \
+RUN cmake -E remove_directory ./evoke/build && \
     cmake -E make_directory ./evoke/build && \
     cmake -E chdir ./evoke/build cmake .. && \
     cmake --build ./evoke/build && \

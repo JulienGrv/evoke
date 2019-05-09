@@ -52,7 +52,7 @@ int main(int argc, const char **argv)
 
     // Init arguments parser
     po::options_description desc("Options");
-    desc.add_options()("help,h", po::bool_switch(&help), "print this message")("verbose", po::bool_switch(&verbose), "enable verbose output")("root", po::value(&root_path), "root directory path of the project")("jobs,j", po::value(&job_count), "build in parallel using N jobs")("toolset,t", po::value(&toolset_name), "toolset name")("reporter,r", po::value(&reporter_name), "reporter name")("cp", po::bool_switch(&compilation_database), "generate compile_commands.json")("cm", po::bool_switch(&cmakelists), "generate CMakelists.txt")("unity,u", po::bool_switch(&unity_build), "create commands for Unity");
+    desc.add_options()("help,h", po::bool_switch(&help), "print this message")("verbose", po::bool_switch(&verbose), "enable verbose output")("root", po::value(&root_path), "root directory path of the project")("jobs,j", po::value(&job_count), "build in parallel using N jobs")("toolset,t", po::value(&toolset_name), "toolset name")("reporter,r", po::value(&reporter_name), "reporter name")("cp", po::bool_switch(&compilation_database), "generate compile_commands.json")("cm", po::bool_switch(&cmakelists), "generate CMakeLists.txt")("unity,u", po::bool_switch(&unity_build), "create commands for Unity");
 
     // Parse arguments
     po::variables_map vm;

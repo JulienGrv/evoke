@@ -25,7 +25,7 @@ Evoke is the simple solution to the complicated problem of build software for C+
 
 Requirements:
 
-- [Boost](https://www.boost.org/) 1.64 or higher for boost.process (and boost.filesystem if standard filesystem is not available)
+- [Boost](https://www.boost.org/) 1.64 or higher for boost.program_options and boost.process (and boost.filesystem if standard filesystem is not available)
 - [CMake](https://cmake.org/) 3.8 or higher
 
 Using [Anaconda](https://www.anaconda.com/), one can install the requirements using the [environment.yml](environment.yml) file:

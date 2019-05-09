@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 project(evoke)
+
+message(STATUS "Using CMake ${CMAKE_VERSION} ...")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -7,8 +10,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(
     FATAL_ERROR
-    "Prevented in-tree build. Please create a build directory outside of the source directory and call cmake from there."
-  )
+      "Prevented in-tree build. "
+      "Please create a build directory outside of the source directory "
+      "and call cmake from there.")
 endif()
 
 set(INCLUDES
@@ -18,8 +22,7 @@ set(INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/reporter/include
     ${CMAKE_CURRENT_SOURCE_DIR}/toolsets/include
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/view/include
-)
+    ${CMAKE_CURRENT_SOURCE_DIR}/view/include)
 
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/evoke/src/Executor.cpp
@@ -44,28 +47,35 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/toolsets/src/generic.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/toolsets/src/known.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/toolsets/src/msvc.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/toolsets/src/Toolset.cpp
-)
+    ${CMAKE_CURRENT_SOURCE_DIR}/toolsets/src/Toolset.cpp)
 
 # Create evoke executable
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-# Threading library is required for boost.process
+# Threading library is required
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-# Boost 1.64 or higher is required for boost.process
-# and boost.filesystem if std filesystem is not available
+# Boost 1.64 or higher is required for boost.process and boost.program_options
+# (and boost.filesystem if std filesystem is not available)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC"
-   OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+   OR ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0"))
-  find_package(Boost 1.64 REQUIRED COMPONENTS filesystem program_options system)
+  # std filesystem not available for MSVC and GCC < 8; use boost.filesystem
+  set(Boost_COMPONENTS filesystem program_options system)
+else()
+  set(Boost_COMPONENTS program_options system)
+  # link std filesystem
+  target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)
+endif()
+
+find_package(Boost 1.64 REQUIRED COMPONENTS ${Boost_COMPONENTS})
+
+# MSVC requires extra linking options for Boost
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   target_link_libraries(${PROJECT_NAME}
                         PRIVATE Boost::disable_autolinking
                                 Boost::dynamic_linking)
-else()
-  find_package(Boost 1.64 REQUIRED COMPONENTS program_options system)
-  target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)
 endif()
 
 target_include_directories(${PROJECT_NAME}

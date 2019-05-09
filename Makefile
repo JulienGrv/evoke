@@ -13,7 +13,7 @@ bin/evoke: bin/evoke_make
 
 bin/evoke_make: $(patsubst %.cpp,o/%.o,$(shell find ./ -name *.cpp))
 	@mkdir -p $(dir $@)
-	$(CXX) -O3 -std=c++17 -pthread -o $@ $^ -L$(BOOST_LIB_DIR) -lboost_filesystem -lboost_system -Wl,-rpath -Wl,$(BOOST_LIB_DIR)
+	$(CXX) -O3 -std=c++17 -pthread -o $@ $^ -L$(BOOST_LIB_DIR) -lboost_filesystem -lboost_program_options -lboost_system -Wl,-rpath -Wl,$(BOOST_LIB_DIR)
 
 clean:
 	@mkdir -p $(dir $@)
